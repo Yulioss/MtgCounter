@@ -6,11 +6,13 @@ import { timerReducer, initialState } from "../reducer/PlayerReducer";
 import MenuMid from "@/components/MenuMid";
 import { useKeepAwake } from 'expo-keep-awake';
 import * as ScreenOrientation from 'expo-screen-orientation';
+import { Player } from "@/types/TypesIndex";
 
 export default function Index() {
   useKeepAwake();
   const [state, dispatch] = useReducer(timerReducer, initialState);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const activePlayerRef = useRef<Player | null>(null);
   const player1 = state.player.find((p) => p.id === 1) || state.player[0];
   const player2 = state.player.find((p) => p.id === 2) || state.player[1];
   const player3 = state.player.find((p) => p.id === 3) || state.player[2];
@@ -19,22 +21,35 @@ export default function Index() {
  
   
   useEffect(() => {
-    const enableKeepAwake = async () => {
-      await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_LEFT);
-    };
-    enableKeepAwake();
-    const activePlayer = state.player.find((p) => p.running);
+        const enableKeepAwake = async () => {
+          await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_LEFT);
+        };
+        enableKeepAwake();
+        
+        const activePlayer = state.player.find((p) => p.running);
+
     if (activePlayer) {
-      intervalRef.current = setInterval(() => {
-        dispatch({ type: "DECREMENT", payload: {player: activePlayer}});
-      }, 1000);
-    } else if (intervalRef.current) {
-      clearInterval(intervalRef.current);
+      activePlayerRef.current = activePlayer; 
+      if (!intervalRef.current) {
+        intervalRef.current = setInterval(() => {
+          if (activePlayerRef.current) {
+            dispatch({ type: "DECREMENT", payload: { player: activePlayerRef.current } });
+          }
+        }, 1000);
+      }
+    } else {
+      activePlayerRef.current = null; 
     }
+
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      
+      if (!activePlayerRef.current && intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     };
-  }, [state.player]);
+  },
+ [state.player]);
   
 
   return (

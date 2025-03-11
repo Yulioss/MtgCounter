@@ -44,7 +44,6 @@ export default function MenuMid({dispatch}: VistaJugadorProps) {
                 <Text style={styles.textBoardWipes}>BW</Text>
                 <Text style={styles.textCountBoardWipes}> {BWCount} </Text>
               </ImageBackground>
-              
             </TouchableOpacity>
         </View>
     )

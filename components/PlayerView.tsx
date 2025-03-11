@@ -1,9 +1,10 @@
-import { Button, Text, View ,StyleSheet, Pressable, TextStyle, TouchableOpacity, Image} from "react-native";
+import { Button, Text, View ,StyleSheet, Pressable, TextStyle, TouchableOpacity, Image, ImageBackground} from "react-native";
 import React, { Dispatch } from "react";
 import { Player } from "@/types/TypesIndex";
 import { PlayerActions } from "@/reducer/PlayerReducer";
 import { ViewStyle } from "react-native/Libraries/StyleSheet/StyleSheetTypes";
 import { textBase } from "@/styles/globalStyles";
+import DamageOpponent from "./DamageOpponent";
 
 interface PlayerViewProps {
   activePlayer: Player,
@@ -11,7 +12,7 @@ interface PlayerViewProps {
   flipped?:boolean
 }
 
-export default function PlayerView({activePlayer, dispatch, flipped}: PlayerViewProps) {
+export default function PlayerView({activePlayer, dispatch, flipped}: Readonly<PlayerViewProps>) {
     const formatTime = (seconds: number) => {
         const minutes = Math.floor(seconds / 60);
         const secs = seconds % 60;
@@ -29,6 +30,11 @@ export default function PlayerView({activePlayer, dispatch, flipped}: PlayerView
           <TouchableOpacity onPress={() => dispatch({type:"DECREMENT_MANUALLY", payload: {player:activePlayer}})} style={styles.buttonDecrement}>
                           <Image source={require("../assets/images/menos.png")} style={styles.imageIncrement} />
           </TouchableOpacity>
+          <View style={styles.viewDamageOp}>
+          <DamageOpponent activePlayer={activePlayer}  dispatch={dispatch} flipped={flipped} idDamage={1} imageOp={"img1"} />
+          <DamageOpponent activePlayer={activePlayer}  dispatch={dispatch} flipped={flipped} idDamage={2} imageOp={"img2"} />
+          <DamageOpponent activePlayer={activePlayer}  dispatch={dispatch} flipped={flipped} idDamage={3} imageOp={"img3"} />
+          </View>
           <View style={styles.viewTextPLayer} pointerEvents="none">
             <Text style={flipped ? styles.textPlayerFlipped: styles.textPlayer}>Player {activePlayer.id} </Text>
           </View>
@@ -95,10 +101,17 @@ const styles = StyleSheet.create({
     bottom:10,
   },
   textPlayer: {
-    ...textBase
+    ...textBase,
   },
   textPlayerFlipped: {
     ...textBase,
     transform: [{ scaleX: -1}]
-  }
+  },
+  viewDamageOp:{
+    width:"50%",
+    justifyContent:"space-between",
+    position:"absolute",
+    flexDirection:"row",
+    bottom:30,
+},
 });
